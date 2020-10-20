@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,6 +10,12 @@ import (
 	"strings"
 	"time"
 )
+
+type FindInfo struct {
+	Search    string   `json:"search" xml:"search"`
+	Sites     []string   `json:"sites" xml:"sites"`
+}
+
 
 func findStrInURL(subsrt string, url string) bool {
 	rez := false
@@ -57,19 +65,100 @@ func readURL(url string) (bool, string) {
 	return true, string(bodyBytes)
 }
 
-func main() {
-	var urlArray [3]string
-	urlArray[0] = "https://mail.ru"
-	urlArray[1] = "https://golang.org/"
-	urlArray[2] = "https://google.com"
-
-	substr := "Go is an open source programming "
-
+func findInURLArray(arr []string, subsrtstr string) string{
+	rez:="Not found"
 	for _, url := range urlArray {
 		rez := findStrInURL(substr, url)
 		if rez {
 			fmt.Printf("Find in page :  %s", url)
+			rez=url
 		}
 	}
+	return rez
+}
+
+func main() {
+
+	router := http.NewServeMux()
+	router.HandleFunc("/setInfo", SetInfoHandler)
+	router.HandleFunc("/getInfo", getInfoHandler)
+
+	log.Println("Starting server at :8091")
+	log.Fatal(http.ListenAndServe(":8091", router))
+
+	
 	fmt.Println("\nbye")
+}
+
+func getInfoHandler(wr http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		wr.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	contentTypeHeader := req.Header.Get("Content-Type")
+
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Println(err)
+		wr.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	defer req.Body.Close()
+
+	info := &FindInfo{}
+	switch contentTypeHeader {
+	case "application/xml":
+		if err = xml.Unmarshal(data, info); err != nil {
+			log.Println(err)
+			wr.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	default:
+		if err = json.Unmarshal(data, info); err != nil {
+			log.Println(err)
+			wr.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+	log.Printf("Search: %s\nSites: %v\n",
+		info.Search, info.Sites,
+	)
+	str:=findStrInURL(info.Sites,info.Sites)
+	wr.WriteHeader(http.StatusOK)
+}
+
+
+func SetInfoHandler(wr http.ResponseWriter, req *http.Request)  {
+	acceptHeader := req.Header.Get("Accept")
+
+	info:=&FindInfo{
+		Search: "Go is an open source programming",
+		Sites: []string{
+			"https://mail.ru",
+			"https://golang.org/",
+			"https://google.com",
+		},
+	}
+	var respBody []byte
+	var err error
+	switch acceptHeader {
+	case "application/xml":
+		respBody, err = xml.Marshal(info)
+		if err != nil {
+			log.Println(err)
+			wr.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		wr.Header().Set("Content-Type", "application/xml")
+	default:
+		respBody, err = json.Marshal(info)
+		if err != nil {
+			log.Println(err)
+			wr.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		wr.Header().Set("Content-Type", "application/json")
+	}
+	wr.Write(respBody)
 }
