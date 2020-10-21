@@ -16,7 +16,7 @@ type FindInfo struct {
 	Sites     []string   `json:"sites" xml:"sites"`
 }
 
-
+// Поиск строки на веб странице
 func findStrInURL(subsrt string, url string) bool {
 	rez := false
 	b, body := readURL(url)
@@ -64,12 +64,12 @@ func readURL(url string) (bool, string) {
 	}
 	return true, string(bodyBytes)
 }
-
-func findInURLArray(arr []string, subsrtstr string) string{
+// Поиск строки в списке веб страниц
+func findInURLArray(arr []string, substr string) string{
 	rez:="Not found"
-	for _, url := range urlArray {
-		rez := findStrInURL(substr, url)
-		if rez {
+	for _, url := range arr {
+		b := findStrInURL(substr, url)
+		if b {
 			fmt.Printf("Find in page :  %s", url)
 			rez=url
 		}
@@ -124,7 +124,8 @@ func getInfoHandler(wr http.ResponseWriter, req *http.Request) {
 	log.Printf("Search: %s\nSites: %v\n",
 		info.Search, info.Sites,
 	)
-	str:=findStrInURL(info.Sites,info.Sites)
+	str:=findInURLArray(info.Sites,info.Search)
+	fmt.Fprintf(wr,"Нашли %s на сайте %s", info.Search, str)
 	wr.WriteHeader(http.StatusOK)
 }
 
