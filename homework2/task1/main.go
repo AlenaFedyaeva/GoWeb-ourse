@@ -80,7 +80,7 @@ func findInURLArray(arr []string, substr string) string{
 func main() {
 
 	router := http.NewServeMux()
-	router.HandleFunc("/setInfo", SetInfoHandler)
+	router.HandleFunc("/setInfo", setInfoHandler)
 	router.HandleFunc("/getInfo", getInfoHandler)
 
 	log.Println("Starting server at :8091")
@@ -89,7 +89,12 @@ func main() {
 	
 	fmt.Println("\nbye")
 }
-
+// Для работы функции надо
+// 1) Обязательно посылать POST
+// 2) добавить в Headers поле Content-type со значением
+// application/json и в rawdata поместить значения 
+// Например такие:
+// {"search":"Go is an open source programming","sites":["https://mail.ru","https://golang.org/","https://google.com"]}
 func getInfoHandler(wr http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		wr.WriteHeader(http.StatusMethodNotAllowed)
@@ -129,8 +134,9 @@ func getInfoHandler(wr http.ResponseWriter, req *http.Request) {
 	wr.WriteHeader(http.StatusOK)
 }
 
-
-func SetInfoHandler(wr http.ResponseWriter, req *http.Request)  {
+// Для работы функции необходимо в запросе выставить Header accept со значением
+// например - application/xml
+func setInfoHandler(wr http.ResponseWriter, req *http.Request)  {
 	acceptHeader := req.Header.Get("Accept")
 
 	info:=&FindInfo{
