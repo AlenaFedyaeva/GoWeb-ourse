@@ -13,44 +13,47 @@ import (
 
 //var tmpl = template.Must(template.New("MyTemplate").ParseFiles("static/tmpl.html"))
 
-type Post struct{
-	Id int
-	Title string
-	Text string
-	Author string
+type Post struct {
+	Id        int
+	Title     string
+	Text      string
+	Author    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-var posts = map [int]*Post{
-	1:&(Post{
-		Id:1,
-		Title:"some text1",
-		Text: "some text1",
-		Author: "some author1",
+var posts = map[int]*Post{
+	1: &(Post{
+		Id:        1,
+		Title:     "some text1",
+		Text:      "some text1",
+		Author:    "some author1",
 		CreatedAt: time.Now().Add(-time.Hour),
 	}),
-	2:&(Post{
-		Id:2,
-		Title:"some text2",
-		Text: "some text2",
-		Author: "some author2",
+	2: &(Post{
+		Id:        2,
+		Title:     "some text2",
+		Text:      "some text2",
+		Author:    "some author2",
 		CreatedAt: time.Now().Add(-time.Hour),
 	}),
-	3:&(Post{
-		Id:3,
-		Title:"some text3",
-		Text: "some text3",
-		Author: "some author3",
+	3: &(Post{
+		Id:        3,
+		Title:     "some text3",
+		Text:      "some text3",
+		Author:    "some author3",
 		CreatedAt: time.Now().Add(-time.Hour),
 	}),
 }
 
-func main()  {
+func main() {
 	fmt.Println("as")
 	router := mux.NewRouter()
 	//Шаблон со списком всех постов / короткие без Text
-	//router.HandleFunc("/", listPostHandler).Methods("GET")
+	router.HandleFunc("/", listPostHandler).Methods("GET")
+	
+	//Exapmple! delete
+	router.HandleFunc("/list", viewList).Methods("GET")
 
 	//Шаблон ст текстовыми полями для задания  Title Text Author
 	//router.HandleFunc("/", createPostHandler).Methods("POST")
@@ -60,71 +63,104 @@ func main()  {
 
 	//Шаблон с текстовыми полями для обновления Title Text Author
 	//router.HandleFunc("/{id}", updatePostHandleID).Methods("PUT")
-    //r.HandleFunc("/articles", ArticlesHandler)
-    //http.Handle("/", r)
-	
+	//r.HandleFunc("/articles", ArticlesHandler)
+	//http.Handle("/", r)
+
 	for key, value := range posts {
 		fmt.Println("Key:", key, "Value:", value)
 	}
-	port:=":8099"
-	fmt.Printf("Start server : port = %s",port)
-	log.Fatal(http.ListenAndServe(port,router))
+	port := ":8097"
+	fmt.Printf("Start server : port = %s", port)
+	log.Fatal(http.ListenAndServe(port, router))
+}
+
+// TaskList - список задач
+type TaskList struct {
+	Name string
+	Description string
+	List []Task
+  }
+  
+  // Task - задача и ее статус
+  type Task struct {
+	ID string
+	Text string
+	Complete bool
+  }
+var simpleList = TaskList{
+	Name: "Название листа",
+	Description: "Описание листа с задачами",
+	List: []Task{
+	Task{"first", "Первая задача", false},
+	Task{"second", "Вторая задача", false},
+	Task{"thrid", "Третья задача", true},
+	},
+  }
+  
+
+func viewList(w http.ResponseWriter, r *http.Request) {
+	tmpl:= template.Must(template.New("Ttt").ParseFiles("./static/tmpl.html"))
+
+	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
+		log.Println(err)
+	}
 }
 
 //GET
-func getPostHandlerID(w http.ResponseWriter, r *http.Request){
-	vars:=mux.Vars(r)
-	postIDRaw,ok:= vars["id"]
+//2. роут и шаблон для просмотра конкретного поста в блоге.
+func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postIDRaw, ok := vars["id"]
 	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return	
-	}
-
-	postID,err:=strconv.Atoi(postIDRaw)
-	if err!=nil{
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	post,ok:=posts[postID]
+
+	postID, err := strconv.Atoi(postIDRaw)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	post, ok := posts[postID]
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	tmpl:=template.Must(template.New("first").Parse(`
-	{{define "T"}}
-	<html>
-		<head>
-			<title> {{.Title}} </title>
-		</head>
-
-		<body> 
-			<h1> {{.Title}} </h1>
-			<p> {{.Text}} </p>
-		</body>
-	</html>
-	{{end}}
-	`))
 
 
-	if err:= tmpl.ExecuteTemplate(w,"T",post); err!= nil{
+	tmpl:= template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_1page.html"))
+
+	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
+		log.Println(err)
+	}
+
+	if err := tmpl.ExecuteTemplate(w, "T", post); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
 	}
-	
-}
-//POST
-func createPostHandler(w http.ResponseWriter, r *http.Request){
 
 }
+
+//POST
+//3. Создайте роут и шаблон для создания материала
+func createPostHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 //PUT
-func updatePostHandleID(w http.ResponseWriter, r *http.Request){
+//3. Создайте роут и шаблон для редактированияматериала.
+func updatePostHandleID(w http.ResponseWriter, r *http.Request) {
 
 }
 
 //GET
-func  listPostHandler(w http.ResponseWriter, r *http.Request)  {
-	fmt.Println("HomeHandler")
-	vars := mux.Vars(r)
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "Category: %v\n", vars["category"])
+//1. роут и шаблон для отображения всех постов в блоге.
+func listPostHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl:= template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_allPosts.html"))
+
+	if err := tmpl.ExecuteTemplate(w, "AllPosts", simpleList); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 }
