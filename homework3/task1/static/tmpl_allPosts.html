@@ -10,6 +10,16 @@
 
 <body>
     <H1>Список всех постов</H1>
+    <div class="uk-container">
+        <div class="uk-card uk-card-body">
+            {{ range $key, $value := . }}
+            <li><strong>{{ $key }}</strong>: <a href="/GoWebCourse/homework3/task1/static/tmpl_1page.html">
+                    {{$value.Title}} </a> , {{$value.Author}}, {{$value.CreatedAt}}, {{$value.Id}}
+            </li>
+            {{ end }}
+
+        </div>
+    </div>
 </body>
 
 </html>

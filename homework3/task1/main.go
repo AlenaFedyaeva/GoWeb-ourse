@@ -67,10 +67,8 @@ func main() {
 	//r.HandleFunc("/articles", ArticlesHandler)
 	//http.Handle("/", r)
 
-	for key, value := range posts {
-		fmt.Println("Key:", key, "Value:", value)
-	}
-	port := ":8097"
+
+	port := ":8096"
 	fmt.Printf("Start server : port = %s", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
@@ -163,9 +161,14 @@ func updatePostHandleID(w http.ResponseWriter, r *http.Request) {
 //GET
 //1. роут и шаблон для отображения всех постов в блоге.
 func listPostHandler(w http.ResponseWriter, r *http.Request) {
+
+	for key, value := range posts {
+		fmt.Println("Key:", key, "Value:", value)
+	}
+
 	tmpl:= template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_allPosts.html"))
 
-	if err := tmpl.ExecuteTemplate(w, "AllPosts", simpleList); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "AllPosts", posts); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
