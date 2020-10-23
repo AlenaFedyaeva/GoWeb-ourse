@@ -55,8 +55,9 @@ func main() {
 	//Exapmple! delete
 	router.HandleFunc("/list", viewList).Methods("GET")
 
-	//Шаблон ст текстовыми полями для задания  Title Text Author
-	//router.HandleFunc("/", createPostHandler).Methods("POST")
+	//Шаблон с текстовыми полями для задания  Title Text Author
+	router.HandleFunc("/create", createPostHandler).Methods("GET")
+	//router.HandleFunc("/create", createPostHandler).Methods("POST")
 
 	//Шаблон со страницей одного поста / полгого с отображением Text
 	router.HandleFunc("/{id}", getPostHandlerID).Methods("GET")
@@ -144,6 +145,12 @@ func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
 //POST
 //3. Создайте роут и шаблон для создания материала
 func createPostHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl:= template.Must(template.New("tmpl_create").ParseFiles("./static/tmpl_create.html"))
+
+	if err := tmpl.ExecuteTemplate(w, "Create", simpleList); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 
 }
 
