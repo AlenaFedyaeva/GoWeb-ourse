@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
     <title>Список всех постов</title>
 </head>
 
@@ -13,8 +14,8 @@
     <div class="uk-container">
         <div class="uk-card uk-card-body">
             {{ range $key, $value := . }}
-            <li><strong>{{ $key }}</strong>: <a href="/GoWebCourse/homework3/task1/static/tmpl_1page.html">
-                    {{$value.Title}} </a> , {{$value.Author}}, {{$value.CreatedAt}}, {{$value.Id}}
+            <li><strong>{{ $key }}</strong>:
+                <a href="/{{$value.Id}}">{{$value.Title}} </a>,author {{$value.Author}}, crated at {{$value.CreatedAt}}
             </li>
             {{ end }}
 
