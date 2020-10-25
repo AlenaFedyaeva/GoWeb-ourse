@@ -51,13 +51,13 @@ func main() {
 	router := mux.NewRouter()
 	//Шаблон со списком всех постов / короткие без Text
 	router.HandleFunc("/", listPostHandler).Methods("GET")
-	
+
 	//Exapmple! delete
 	router.HandleFunc("/list", viewList).Methods("GET")
 
 	//Шаблон с текстовыми полями для задания  Title Text Author
-	router.HandleFunc("/create", createPostHandler).Methods("GET")
-	//router.HandleFunc("/create", createPostHandler).Methods("POST")
+	router.HandleFunc("/create", createPostHandlerGet).Methods("GET")
+	router.HandleFunc("/create", createPostHandlerPost).Methods("POST")
 
 	//Шаблон со страницей одного поста / полгого с отображением Text
 	router.HandleFunc("/{id}", getPostHandlerID).Methods("GET")
@@ -67,38 +67,37 @@ func main() {
 	//r.HandleFunc("/articles", ArticlesHandler)
 	//http.Handle("/", r)
 
-
-	port := ":8091"
+	port := ":9095"
 	fmt.Printf("Start server : port = %s", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
 
 // TaskList - список задач
 type TaskList struct {
-	Name string
+	Name        string
 	Description string
-	List []Task
-  }
-  
-  // Task - задача и ее статус
-  type Task struct {
-	ID string
-	Text string
+	List        []Task
+}
+
+// Task - задача и ее статус
+type Task struct {
+	ID       string
+	Text     string
 	Complete bool
-  }
+}
+
 var simpleList = TaskList{
-	Name: "Название листа",
+	Name:        "Название листа",
 	Description: "Описание листа с задачами",
 	List: []Task{
-	Task{"first", "Первая задача", false},
-	Task{"second", "Вторая задача", false},
-	Task{"thrid", "Третья задача", true},
+		Task{"first", "Первая задача", false},
+		Task{"second", "Вторая задача", false},
+		Task{"thrid", "Третья задача", true},
 	},
-  }
-  
+}
 
 func viewList(w http.ResponseWriter, r *http.Request) {
-	tmpl:= template.Must(template.New("Ttt").ParseFiles("./static/tmpl.html"))
+	tmpl := template.Must(template.New("Ttt").ParseFiles("./static/tmpl.html"))
 
 	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
 		log.Println(err)
@@ -126,8 +125,7 @@ func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	tmpl:= template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_1page.html"))
+	tmpl := template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_1page.html"))
 
 	if err := tmpl.ExecuteTemplate(w, "list", simpleList); err != nil {
 		log.Println(err)
@@ -140,16 +138,27 @@ func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//POST
+//Get
 //3. Создайте роут и шаблон для создания материала
-func createPostHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl:= template.Must(template.New("tmpl_create").ParseFiles("./static/tmpl_create.html"))
-
-	if err := tmpl.ExecuteTemplate(w, "Create", simpleList); err != nil {
+func createPostHandlerGet(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.New("tmpl88").ParseFiles("./static/tmpl_create.html"))
+	if err := tmpl.ExecuteTemplate(w, "CreatePosts", struct{ Success bool }{true}); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+}
+
+//POST
+//3. Создайте роут и шаблон для создания материала
+func createPostHandlerPost(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	//fmt.Fprintf(w, "parse data") // write data to response
+	// logic part of log in
+	fmt.Println("username:", r.Form["title"])
+	fmt.Println("password:", r.Form["author"])
+
+	fmt.Fprintln(w, r.Form)
 }
 
 //PUT
@@ -166,7 +175,7 @@ func listPostHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Key:", key, "Value:", value)
 	}
 
-	tmpl:= template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_allPosts.html"))
+	tmpl := template.Must(template.New("tmpl_1page").ParseFiles("./static/tmpl_allPosts.html"))
 
 	if err := tmpl.ExecuteTemplate(w, "AllPosts", posts); err != nil {
 		log.Println(err)

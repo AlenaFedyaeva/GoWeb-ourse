@@ -1,16 +1,51 @@
-{{define "Create"}}
+{{define "CreatePosts"}}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Новый пост</title>
+    <title>Create post</title>
+    {{template "head"}}
 </head>
 
 <body>
-    <H1>Новый пост</H1>
+    {{template "header"}}
+    <div class="uk-container">
+
+        <div class="uk-navbar-left">
+            <form action="/create" method="post">
+                Title:<input type="text" name="title"> Author:
+                <input type="text" name="author"> Post text:
+                <textarea name="text"></textarea><br />
+
+                <input type="submit" value="Save post">
+
+
+            </form>
+        </div>
+
+    </div>
+    {{template "footer"}}
 </body>
+<!----------------------------------------------------->
 
 </html>
+{{end}} {{define "head"}}
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" /> {{end}} {{define "header"}}
+<header>
+    <nav class="uk-navbar-container" uk-navbar>
+        <a class="uk-navbar-item uk-logo" href="/">Список постов</a>
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+                <li><a href="/create">Новый пост</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+{{end}} {{define "footer"}}
+<footer>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit-icons.min.js"></script>
+</footer>
 {{end}}
