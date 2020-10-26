@@ -9,15 +9,29 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 )
 
 //var tmpl = template.Must(template.New("MyTemplate").ParseFiles("static/tmpl.html"))
 
+// Set a Decoder instance as a package global, because it caches
+// meta-data about structs, and an instance can be shared safely.
+var (
+	decoder = schema.NewDecoder()
+	postID = 3
+)
+
+
+func getPostId() int{
+	postID++
+	return postID
+}
+
 type Post struct {
 	Id        int
-	Title     string
-	Text      string
-	Author    string
+	Title     string `schema:"title,title2example"`
+	Text      string `schema:"text"`
+	Author    string `schema:"author"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -25,9 +39,9 @@ type Post struct {
 var posts = map[int]*Post{
 	1: &(Post{
 		Id:        1,
-		Title:     "some text1",
-		Text:      "some text1",
-		Author:    "some author1",
+		Title:     "some text1" ,
+		Text:      "some text1" ,
+		Author:    "some author1" ,
 		CreatedAt: time.Now().Add(-time.Hour),
 	}),
 	2: &(Post{
@@ -67,7 +81,7 @@ func main() {
 	//r.HandleFunc("/articles", ArticlesHandler)
 	//http.Handle("/", r)
 
-	port := ":9095"
+	port := ":9096"
 	fmt.Printf("Start server : port = %s", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
@@ -152,11 +166,24 @@ func createPostHandlerGet(w http.ResponseWriter, r *http.Request) {
 //POST
 //3. Создайте роут и шаблон для создания материала
 func createPostHandlerPost(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	//fmt.Fprintf(w, "parse data") // write data to response
-	// logic part of log in
-	fmt.Println("username:", r.Form["title"])
-	fmt.Println("password:", r.Form["author"])
+	err:=r.ParseForm()
+	if err != nil {
+		log.Println(err)// Handle error
+    }
+
+	newID:=getPostId()
+	post:= Post{ 
+		Id:       newID,
+	}
+
+    // r.PostForm is a map of our POST form values
+    err = decoder.Decode(&post, r.PostForm)
+    if err != nil {
+        log.Println(err)// Handle error
+    }
+	fmt.Println(post)
+	posts[newID] = &post
+	
 
 	fmt.Fprintln(w, r.Form)
 }
