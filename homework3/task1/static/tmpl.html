@@ -1,4 +1,4 @@
-{{define "T"}}
+{{define "ListTmpl"}}
 <html>
 
 <body>{{.}}</body>
@@ -10,11 +10,11 @@
 
 <head>
     <title>{{.Name}}</title>
-    {{template "head"}}
+    {{template "headl"}}
 </head>
 
 <body>
-    {{template "header"}}
+    {{template "headerl"}}
 
     <div class="uk-container">
         <div class="uk-card uk-card-body">
@@ -44,13 +44,13 @@
         }
     </script>
 
-    {{template "footer"}}
+    {{template "footerl"}}
 </body>
 
 </html>
-{{end}} {{define "head"}}
+{{end}} {{define "headl"}}
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" /> {{end}} {{define "header"}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" /> {{end}} {{define "headerl"}}
 <header>
     <nav class="uk-navbar-container" uk-navbar>
         <a class="uk-navbar-item uk-logo" href="/">Мои списки</a>
@@ -61,7 +61,7 @@
         </div>
     </nav>
 </header>
-{{end}} {{define "footer"}}
+{{end}} {{define "footerl"}}
 <footer>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit.min.js"></script>

@@ -16,7 +16,8 @@
             <ul class="uk-list uk-list-divider">
                 {{ range $key, $value := . }}
                 <li><strong>{{ $key }}</strong>:
-                    <a href="/{{$value.Id}}">{{$value.Title}} </a>,author {{$value.Author}}, crated at {{$value.CreatedAt}}
+                    <a href="/{{$value.Id}}">{{$value.Title}} </a>,author {{$value.Author}}, crated at {{$value.CreatedAt}},
+                    <a href="/edit/{{$value.Id}}"> редактировать статью {{$value.Title}} </a>
                 </li>
                 {{ end }}
             </ul>
