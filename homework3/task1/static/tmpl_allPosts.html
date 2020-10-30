@@ -1,0 +1,57 @@
+{{define "AllPosts"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{template "head"}}
+    <title>Список всех постов</title>
+</head>
+
+<body>
+    {{template "header"}}
+
+    <div class="uk-container">
+        <div class="uk-card uk-card-body">
+            <h3 class="uk-card-title uk-heading-divider">Список всех постов<button onclick="newItem()" uk-icon="icon: plus"></button></h3>
+            <ul class="uk-list uk-list-divider">
+                {{ range $key, $value := . }}
+                <li><strong>{{ $key }}</strong>:
+                    <a href="/{{$value.Id}}">{{$value.Title}} </a>,author {{$value.Author}}, crated at {{$value.CreatedAt}},
+                    <a href="/edit/{{$value.Id}}"> редактировать статью {{$value.Title}} </a>
+                </li>
+                {{ end }}
+            </ul>
+        </div>
+    </div>
+
+
+    <script>
+        function newItem() {
+            alert("Событие создания нового поста")
+        }
+    </script>
+
+    {{template "footer"}}
+</body>
+
+</html>
+{{end}} {{define "head"}}
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" /> {{end}} {{define "header"}}
+<header>
+    <nav class="uk-navbar-container" uk-navbar>
+        <a class="uk-navbar-item uk-logo" href="/">Список постов</a>
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+                <li><a href="/create">Новый пост</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+{{end}} {{define "footer"}}
+<footer>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit-icons.min.js"></script>
+</footer>
+{{end}}

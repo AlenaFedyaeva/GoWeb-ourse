@@ -1,0 +1,31 @@
+{{define "EditPost"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Edit post</title>
+    {{template "head"}}
+</head>
+
+<body>
+    {{template "header"}}
+    <div class="uk-container">
+
+        <div class="uk-navbar-left">
+            <form action="/" method="post">
+                <!-- <form action="/" method="put"> -->
+                <div>
+                    <input type="text" name="title" value="{{.Title}}"> <br> Author:
+                    <input type="text " name="author" value=" {{.Author}} "> <br> Post text:
+                    <textarea name="text">{{.Text}}</textarea> <br />
+                    <input type="submit" value="Save post ">
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+    {{template "footer"}}
+</body>
+
+{{end}}
