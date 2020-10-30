@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -53,14 +52,4 @@ func update(id int,p Post){
 }
 
 func dbConnect()  {
-	db, err := sql.Open("mysql", "root:my-secret-pw@/task_list_app")
-	if err != nil {
-		log.Println(err)
-	}
-	database = db
-
-	if err := db.Ping(); err != nil {
-		log.Println(err)
-	}
-	defer database.Close()
 }

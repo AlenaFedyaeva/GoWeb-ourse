@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -60,8 +61,21 @@ var posts = map[int]*Post{
 func main(){
 
 	fmt.Println("task 4 starting")
+	db, err := sql.Open("mysql", "root:12345678@/posts")
+	if err != nil {
+		log.Println(err)
+	}
+	database = db
 
-	dbConnect()
+	if err := db.Ping(); err != nil {
+		log.Println(err)
+	}
+	defer database.Close()
 
+	posts,err:=selectAll() 
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(posts)
 	fmt.Println("task 4 bye")
 }
