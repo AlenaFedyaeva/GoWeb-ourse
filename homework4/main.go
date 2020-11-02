@@ -29,8 +29,8 @@ type Post struct {
 	Title     string `schema:"title,title2example" json:"title" xml:"title`
 	Text      string `schema:"text" json:"text" xml:"text`
 	Author    string `schema:"author" json:"author" xml:"author`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time  `schema:"created_at" json:"created_at" xml:"created_at`
+	UpdatedAt time.Time  `schema:"updated_at" json:"updated_at" xml:"updated_at`
 }
 
 var posts = map[int]*Post{
@@ -61,8 +61,12 @@ var posts = map[int]*Post{
 func main(){
 
 	fmt.Println("task 4 starting")
-	db, err := sql.Open("mysql", "root:12345678@/posts")
+	//db, err := sql.Open("mysql", "root:12345678@/posts")
+	db, err := sql.Open("mysql", "root:my-secret-pw@/posts?parseTime=true")
+
+	
 	if err != nil {
+		log.Println("bd conn")
 		log.Println(err)
 	}
 	database = db
@@ -72,10 +76,6 @@ func main(){
 	}
 	defer database.Close()
 
-	posts,err:=selectAll() 
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(posts)
-	fmt.Println("task 4 bye")
+	tryBD()
+	
 }
