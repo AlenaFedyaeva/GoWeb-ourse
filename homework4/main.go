@@ -4,67 +4,29 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"time"
+	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 )
 
-func getPostId() int {
-	postID++
-	return postID
-}
+
 var (
 	// Set a Decoder instance as a package global, because it caches
 	// meta-data about structs, and an instance can be shared safely.
-		decoder   = schema.NewDecoder()
-		postID    = 3
-		database *sql.DB
-		// templates = template.Must(template.ParseFiles("./static/tmpl_1page.html", "./static/tmpl.html",
-		// 	"./static/tmpl_allPosts.html", "./static/tmpl_edit.html", "./static/tmpl_create.html")) //Template caching
-	)
-	
-type Post struct {
-	Id        int
-	Title     string `schema:"title,title2example" json:"title" xml:"title`
-	Text      string `schema:"text" json:"text" xml:"text`
-	Author    string `schema:"author" json:"author" xml:"author`
-	CreatedAt time.Time  `schema:"created_at" json:"created_at" xml:"created_at`
-	UpdatedAt time.Time  `schema:"updated_at" json:"updated_at" xml:"updated_at`
-}
+	decoder   = schema.NewDecoder()
+	postID    = 3
+	database  *sql.DB
+	// templates = template.Must(template.ParseFiles("./static/tmpl_1page.html", "./static/tmpl.html",
+		// "./static/tmpl_allPosts.html", "./static/tmpl_edit.html", "./static/tmpl_create.html")) //Template caching
+)
 
-var posts = map[int]*Post{
-	1: &(Post{
-		Id:        1,
-		Title:     "some text1",
-		Text:      "some text1",
-		Author:    "some author1",
-		CreatedAt: time.Now().Add(-time.Hour),
-	}),
-	2: &(Post{
-		Id:        2,
-		Title:     "some text2",
-		Text:      "some text2",
-		Author:    "some author2",
-		CreatedAt: time.Now().Add(-time.Hour),
-	}),
-	3: &(Post{
-		Id:        3,
-		Title:     "some text3",
-		Text:      "some text3",
-		Author:    "some author3",
-		CreatedAt: time.Now().Add(-time.Hour),
-	}),
-}
-
-
-func main(){
+func main() {
 
 	fmt.Println("task 4 starting")
-	//db, err := sql.Open("mysql", "root:12345678@/posts")
 	db, err := sql.Open("mysql", "root:my-secret-pw@/posts?parseTime=true")
 
-	
 	if err != nil {
 		log.Println("bd conn")
 		log.Println(err)
@@ -76,6 +38,27 @@ func main(){
 	}
 	defer database.Close()
 
-	tryBD()
-	
+	//tryBD()
+
+	router := mux.NewRouter()//.StrictSlash(true)
+	//Шаблон со списком всех постов / короткие без Text
+	router.HandleFunc("/", listPostHandler).Methods("GET")
+
+	//Шаблон с текстовыми полями для задания  Title Text Author
+	//router.HandleFunc("/create", createPostHandlerGet).Methods("GET")
+	//router.HandleFunc("/create", createPostHandlerPost).Methods("POST")
+
+	//Шаблон со страницей одного поста / полгого с отображением Text
+	//router.HandleFunc("/{id}", getPostHandlerID).Methods("GET")
+
+	//Шаблон с текстовыми полями для обновления Title Text Author
+	// router.HandleFunc("/edit/{id}", updatePostHandleGet).Methods("GET")
+	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("POST")
+	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("PUT")
+	port := ":9090"
+	fmt.Printf("Start server : port = %s", port)
+	// http.Handle("/", router)
+	log.Fatal(http.ListenAndServe(port, router))
+
+
 }
