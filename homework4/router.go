@@ -27,14 +27,14 @@ type Post struct {
 	UpdatedAt time.Time
 }
 
-type AllPostsStruct struct{
+type AllPostsStruct struct {
 	Title string
-	Data map[int]*Post
+	Data  map[int]*Post
 }
 
-type OnePostsStruct struct{
+type OnePostsStruct struct {
 	Title string
-	Data Post
+	Data  Post
 }
 
 var posts = map[int]*Post{
@@ -87,8 +87,8 @@ func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
 }
 
 func renderTemplate(w http.ResponseWriter, tmplName string, data interface{}) {
-	templates:= template.Must(template.ParseFiles("./static/tmpl_1page.html", "./static/tmpl.html",
-	"./static/tmpl_allPosts.html", "./static/tmpl_edit.html", "./static/tmpl_create.html")) //Template caching
+	templates := template.Must(template.ParseFiles("./static/tmpl_1page.html", "./static/tmpl.html",
+		"./static/tmpl_allPosts.html", "./static/tmpl_edit.html", "./static/tmpl_create.html")) //Template caching
 
 	err := templates.ExecuteTemplate(w, tmplName, data)
 	if err != nil {
@@ -100,7 +100,7 @@ func renderTemplate(w http.ResponseWriter, tmplName string, data interface{}) {
 //Get
 //3. Создайте роут и шаблон для создания материала
 func createPostHandlerGet(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "CreatePosts", struct{ Success bool }{true})
+	renderTemplate(w, "CreatePosts", struct{ Title string }{"Новый пост"})
 }
 
 //POST
@@ -115,22 +115,17 @@ func createPostHandlerPost(w http.ResponseWriter, r *http.Request) {
 	post := Post{
 		Id: newID,
 	}
-
 	// r.PostForm is a map of our POST form values
 	err = decoder.Decode(&post, r.PostForm)
 	if err != nil {
 		log.Println(err) // Handle error
 	}
 	fmt.Println(post)
-	posts[newID] = &post
-	fmt.Fprintln(w, r.Form)
 
-	//data, err := ioutil.ReadAll(r.Body)
-	//fmt.Println(r.PostForm)
-	//fmt.Println(mux.Vars(r))
-	//defer r.Body.Close()
-	//http.Redirect(w, r, "/", http.StatusSeeOther)
-	http.Redirect(w, r, "/", http.StatusFound)
+	//Update BD
+	insertPost(post)
+	
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 //3. Создайте роут и шаблон для редактированияматериала.
@@ -197,17 +192,48 @@ func updatePostHandlePut(w http.ResponseWriter, r *http.Request) {
 		log.Println(err) // Handle error
 	}
 	fmt.Println(post)
-	posts[id] = &post
+	
+	//posts[id] = &post
+	updateRow(id, post)
+	// fmt.Println(posts[id])
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
-	fmt.Println(posts[id])
-	//fmt.Fprintln(w, r.Form)
-	//fmt.Fprintf(w, "Привет, updatePostHandlePut", nil)
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
-	http.Redirect(w, r, "/", http.StatusFound)
+//Delete post
+func deletePostHandlerPost(w http.ResponseWriter, r *http.Request)  {
+	vars := mux.Vars(r)
+	postIDRaw, ok := vars["id"]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(postIDRaw)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = r.ParseForm()
+	if err != nil {
+		log.Println(err) // Handle error
+	}
+
+	post := Post{Id: id}
+
+	// r.PostForm is a map of our POST form values
+	err = decoder.Decode(&post, r.PostForm)
+	if err != nil {
+		log.Println(err) // Handle error
+	}
+	fmt.Println(post)
+	
+	deleteRow(id) 
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 //GET
 //1. роут и шаблон для отображения всех постов в блоге.
 func listPostHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "AllPosts", AllPostsStruct{Title:"Список всех постов",Data: posts})
+	renderTemplate(w, "AllPosts", AllPostsStruct{Title: "Список всех постов", Data: posts})
 }

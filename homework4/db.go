@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,6 +22,7 @@ func insertPost(p Post) error {
 }
 
 func selectAll() (map[int]*Post, error) {
+	//1)
 	res := make(map[int]*Post)
 	rows, err := database.Query("SELECT id,author,title,postText,created_at,updated_at FROM posts.posts")
 
@@ -42,6 +44,14 @@ func selectAll() (map[int]*Post, error) {
 	return res, nil
 }
 
+func updatePostsMap() {
+	postsNew, err := selectAll()
+	if err != nil {
+		fmt.Println(err)
+	}
+	posts = postsNew
+}
+
 func selectPost(id int) (Post, error) {
 	post := Post{}
 
@@ -53,17 +63,12 @@ func selectPost(id int) (Post, error) {
 	return post, err
 }
 
-func updatePostsMap() {
-	postsNew, err := selectAll()
-	if err != nil {
-		fmt.Println(err)
-	}
-	posts = postsNew
-}
+
 
 func updateRow(id int, p Post) error {
 	//1) update bd
-	_, err := database.Exec("update posts set author=?,title=?,postText=?,updated_at=?) where id =?",
+	p.UpdatedAt=time.Now()
+	_, err := database.Exec("update posts set author=?,title=?,postText=?,updated_at=? where id =?",
 		p.Author, p.Title, p.Text, p.UpdatedAt, id)
 	if err != nil {
 		log.Println(err)

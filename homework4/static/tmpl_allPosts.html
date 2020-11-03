@@ -17,7 +17,10 @@
                 {{ range $key, $value := .Data }}
                 <li><strong>{{ $key }}</strong>: Название поста: <a href="/{{$value.Id}}">{{$value.Title}} </a><br> автор : {{$value.Author}}, время создания {{$value.CreatedAt}}<br>
                     <a href="/edit/{{$value.Id}}"> редактировать статью {{$value.Title}} </a> <br>
-                    <a href="/" onclick="delItem()"> удалить статью {{$value.Title}} </a>
+
+                    <form action="/delete/{{$value.Id}}" method="POST" name="del">
+                        <button type="delete" id="xbutton">Delete</button>
+                    </form>
                 </li>
                 {{ end }}
             </ul>
