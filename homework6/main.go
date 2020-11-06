@@ -16,6 +16,7 @@ import (
 
 var collection *mongo.Collection
 var client *mongo.Client
+var postID = 3
 
 func init() {
 	db, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -58,16 +59,10 @@ func main() {
 
 	fmt.Println("6 lab")
 
-	
 	router.Run(port)
 
 }
 
 func listTaskLists(c *gin.Context) {
-	// lists, err := GetLists()
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
 	c.HTML(http.StatusOK, "alllists", nil)
 }
