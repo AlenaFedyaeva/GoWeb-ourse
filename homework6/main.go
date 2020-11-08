@@ -16,7 +16,6 @@ import (
 
 var collection *mongo.Collection
 var client *mongo.Client
-var postID = 3
 
 func init() {
 	db, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -52,12 +51,10 @@ func main() {
 	// router.GET("/lists/add", createTaskListForm)
 	// router.POST("/lists/edit", updateTaskList)
 	// router.GET("/lists/edit", updateTaskListForm)
-	port := ":8092"
+	port := ":8093"
 	fmt.Printf(" start server: %s", port)
 
-	InsertPost("title1", "body1")
-
-	fmt.Println("6 lab")
+	tryMongoDB()
 
 	router.Run(port)
 

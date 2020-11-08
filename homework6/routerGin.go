@@ -10,7 +10,7 @@ import (
 //2. роут и шаблон для просмотра конкретного поста в блоге.
 func getPostHandlerID(w http.ResponseWriter, r *http.Request) {
 	
-	renderTemplate(w, "onePost", post)
+	// renderTemplate(w, "onePost", post)
 
 }
 
@@ -28,5 +28,5 @@ func renderTemplate(w http.ResponseWriter, tmplName string, data interface{}) {
 //GET
 //1. роут и шаблон для отображения всех постов в блоге.
 func listPostHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "AllPosts", AllPostsStruct{Title: "Список всех постов", Data: posts})
+	// renderTemplate(w, "AllPosts", AllPostsStruct{Title: "Список всех постов", Data: posts})
 }

@@ -22,13 +22,7 @@ type Task struct {
 	Completed bool   `json:"completed"`
 }
 //***************************************************************************
-
-
-func getPostId() int {
-	postID++
-	return postID
-}
-
+//primitive.ObjectID 
 type Post struct {
 	Id        int	 `bson:"_id" json:"id"`
 	Title     string `schema:"title,title2example" json:"title" xml:"title`
