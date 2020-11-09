@@ -3,15 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var collection *mongo.Collection
@@ -32,6 +29,7 @@ func init() {
 		log.Println(err)
 	}
 	collection = client.Database("posts").Collection("postlist")
+	updatePostsMap()
 }
 
 func main() {
@@ -43,19 +41,29 @@ func main() {
 
 	router := gin.Default()
 
-	router.SetHTMLTemplate(template.Must(template.New("MyTemplate").ParseFiles("static/tmpl.html")))
-
+	// router.SetHTMLTemplate(template.Must(template.New("MyTemplate").ParseFiles("static/tmpl.html")))
+	router.LoadHTMLGlob("static/*")
 	router.GET("/lists", listTaskLists)
-	// router.GET("/list", getTaskList)
-	// router.POST("/lists/add", createTaskList)
-	// router.GET("/lists/add", createTaskListForm)
-	// router.POST("/lists/edit", updateTaskList)
-	// router.GET("/lists/edit", updateTaskListForm)
+
+	//Шаблон со списком всех постов / короткие без Text
+	router.GET("/", listPostHandler)
+	// router.HandleFunc("/delete/{id}", deletePostHandlerPost).Methods("POST")
+
+	// //Шаблон с текстовыми полями для задания  Title Text Author
+	// router.HandleFunc("/create", createPostHandlerGet).Methods("GET")
+	// router.HandleFunc("/create", createPostHandlerPost).Methods("POST")
+
+	// //Шаблон со страницей одного поста / полгого с отображением Text
+	router.GET("/post/:id", getPostHandlerID)
+
+	// //Шаблон с текстовыми полями для обновления Title Text Author
+	// router.HandleFunc("/edit/{id}", updatePostHandleGet).Methods("GET")
+	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("POST")
+	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("PUT")
+
 	port := ":8093"
 	fmt.Printf(" start server: %s", port)
-
-	tryMongoDB()
-
+	// tryMongoDB()
 	router.Run(port)
 
 }
