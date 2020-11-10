@@ -1,0 +1,20 @@
+//переключиться на другую базу(P.S. даже не существующую) 
+use posts
+
+//просмотр таблиц
+show collections
+
+
+//Метод insertOne добавляет к документу поле _id если оно 
+//отсутствует и добавляет документ в коллекцию.
+db.users.insertOne({ name: 'Merrick', email: 'test@gmail.com'})
+
+//Запросы в массивах
+db.users.find({ comments: { name: 'Rock' } })
+
+db.users.find({ comments:
+  { $all: [{ name: 'Rock', name: 'John' }] 
+
+
+
+
