@@ -15,7 +15,6 @@ const (
 	DB_COLLECTION = "posts"
 )
 
-//insertPosts - вставляем пост в БД
 
 func updatePostsMap() {
 	postsNew, err := selectAll()

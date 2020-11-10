@@ -7,17 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// import (
-// 	"fmt"
-// 	"html"
-// 	"log"
-// 	"net/http"
-// 	"os"
-// 	"strconv"
-// 	"text/template"
+var (
+	postID = 4
+)
 
-// 	"github.com/gorilla/mux"
-// )
+func getPostId() int {
+	postID++
+	return postID
+}
 
 //GET
 //2. роут и шаблон для просмотра конкретного поста в блоге.
@@ -35,7 +32,7 @@ func getPostHandlerID(c *gin.Context) {
 		return
 	}
 
-	renderTemplate(c, "onePost",post)
+	renderTemplate(c, "onePost", post)
 }
 
 func renderTemplate(c *gin.Context, tmplName string, data interface{}) {
@@ -44,138 +41,90 @@ func renderTemplate(c *gin.Context, tmplName string, data interface{}) {
 
 // //Get
 // //3. Создайте роут и шаблон для создания материала
-// func createPostHandlerGet(w http.ResponseWriter, r *http.Request) {
-// 	renderTemplate(w, "CreatePosts", struct{ Title string }{"Новый пост"})
-// }
+func createPostHandlerGet(c *gin.Context) {
+	renderTemplate(c, "CreatePosts", struct{ Title string }{"Новый пост"})
+}
 
 // //POST
 // //3. Создайте роут и шаблон для создания материала
-// func createPostHandlerPost(w http.ResponseWriter, r *http.Request) {
-// 	err := r.ParseForm()
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
+func createPostHandlerPost(c *gin.Context) {
+	c.Request.ParseForm()
 
-// 	newID := getPostId()
-// 	post := Post{
-// 		Id: newID,
-// 	}
-// 	// r.PostForm is a map of our POST form values
-// 	err = decoder.Decode(&post, r.PostForm)
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
-// 	fmt.Println(post)
+	newID := getPostId()
+	post := Post{
+		Id:     newID,
+		Title:  c.Request.FormValue("title"),
+		Text:   c.Request.FormValue("text"),
+		Author: c.Request.FormValue("author"),
+	}
+	// fmt.Println(post)
 
-// 	//Update BD
-// 	insertPost(post)
+	//Update BD
+	insertPost(post)
 
-// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-// }
+	c.Redirect(http.StatusSeeOther, "/")
+}
 
 // //3. Создайте роут и шаблон для редактированияматериала.
-// func updatePostHandleGet(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprintln(os.Stdout, r.Form)
-// 	if r.Method == "GET" {
-// 		fmt.Fprintf(os.Stdout, "GET, %q", html.EscapeString(r.URL.Path))
-// 	} else if r.Method == "POST" {
-// 		fmt.Fprintf(os.Stdout, "POST, %q", html.EscapeString(r.URL.Path))
-// 	} else if r.Method == "PUT" {
-// 		fmt.Fprintf(os.Stdout, "PUT, %q", html.EscapeString(r.URL.Path))
-// 	} else {
-// 		fmt.Fprintf(os.Stdout, "Invalid request method.", 405)
-// 	}
+func updatePostHandleGet(c *gin.Context) {
+	postIDRaw := c.Param("id")
+	if postIDRaw == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "empty id value"})
+		return
+	}
 
-// 	vars := mux.Vars(r)
-// 	postIDRaw, ok := vars["id"]
-// 	if !ok {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
+	postID, err := strconv.Atoi(postIDRaw)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	post := posts[postID]
 
-// 	postID, err := strconv.Atoi(postIDRaw)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
-// 	post, ok := posts[postID]
-// 	if !ok {
-// 		w.WriteHeader(http.StatusNotFound)
-// 		return
-// 	}
-// 	renderTemplate(w, "EditPost", post)
-// }
+	renderTemplate(c, "EditPost", post)
+}
 
-// //PUT
-// //Проверяла через свой браузер: работает только c POST.
-// //C Postman PUT работает:x-www-form-urlncoded заполняем ключи author, text, title и значения  и отправляем POST
-// func updatePostHandlePut(w http.ResponseWriter, r *http.Request) {
-// 	//renderTemplate(w, "AllPosts", posts)
-// 	vars := mux.Vars(r)
-// 	postIDRaw, ok := vars["id"]
-// 	if !ok {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
+//PUT
+//C Postman PUT работает:x-www-form-urlncoded заполняем ключи author, text, title и значения  и отправляем POST
+func updatePostHandlePut(c *gin.Context) {
+	postIDRaw := c.Param("id")
+	if postIDRaw == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "empty id value"})
+		return
+	}
 
-// 	id, err := strconv.Atoi(postIDRaw)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
+	postID, err := strconv.Atoi(postIDRaw)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-// 	err = r.ParseForm()
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
+	post := Post{
+		Title:  c.Request.FormValue("title"),
+		Text:   c.Request.FormValue("text"),
+		Author: c.Request.FormValue("author"),
+	}
+	updateRow(postID, post)
 
-// 	post := Post{Id: id}
+	c.Redirect(http.StatusSeeOther, "/")
+}
 
-// 	// r.PostForm is a map of our POST form values
-// 	err = decoder.Decode(&post, r.PostForm)
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
-// 	fmt.Println(post)
+//Delete post
+func deletePostHandlerPost(c *gin.Context)  {
+	postIDRaw := c.Param("id")
+	if postIDRaw == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "empty id value"})
+		return
+	}
 
-// 	//posts[id] = &post
-// 	updateRow(id, post)
-// 	// fmt.Println(posts[id])
-// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-// }
+	postID, err := strconv.Atoi(postIDRaw)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-// //Delete post
-// func deletePostHandlerPost(w http.ResponseWriter, r *http.Request)  {
-// 	vars := mux.Vars(r)
-// 	postIDRaw, ok := vars["id"]
-// 	if !ok {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	id, err := strconv.Atoi(postIDRaw)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	err = r.ParseForm()
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
-
-// 	post := Post{Id: id}
-
-// 	// r.PostForm is a map of our POST form values
-// 	err = decoder.Decode(&post, r.PostForm)
-// 	if err != nil {
-// 		log.Println(err) // Handle error
-// 	}
-// 	fmt.Println(post)
-
-// 	deleteRow(id)
-// 	http.Redirect(w, r, "/", http.StatusSeeOther)
-// }
+	deleteRow(postID)
+	c.Redirect(http.StatusSeeOther, "/")
+}
 
 // //GET
 // //1. роут и шаблон для отображения всех постов в блоге.

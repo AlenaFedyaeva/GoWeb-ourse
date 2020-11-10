@@ -47,21 +47,20 @@ func main() {
 
 	//Шаблон со списком всех постов / короткие без Text
 	router.GET("/", listPostHandler)
-	// router.HandleFunc("/delete/{id}", deletePostHandlerPost).Methods("POST")
+	router.POST("/delete/:id", deletePostHandlerPost)
 
-	// //Шаблон с текстовыми полями для задания  Title Text Author
-	// router.HandleFunc("/create", createPostHandlerGet).Methods("GET")
-	// router.HandleFunc("/create", createPostHandlerPost).Methods("POST")
+	//Шаблон с текстовыми полями для задания  Title Text Author
+	router.GET("/create", createPostHandlerGet)
+	router.POST("/create", createPostHandlerPost)
 
-	// //Шаблон со страницей одного поста / полгого с отображением Text
+	//Шаблон со страницей одного поста / полгого с отображением Text
 	router.GET("/post/:id", getPostHandlerID)
 
-	// //Шаблон с текстовыми полями для обновления Title Text Author
-	// router.HandleFunc("/edit/{id}", updatePostHandleGet).Methods("GET")
-	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("POST")
-	// router.HandleFunc("/edit/{id}", updatePostHandlePut).Methods("PUT")
+	//Шаблон с текстовыми полями для обновления Title Text Author
+	router.GET("/edit/:id", updatePostHandleGet)
+	router.POST("/edit/:id", updatePostHandlePut)
 
-	port := ":8093"
+	port := ":8094"
 	fmt.Printf(" start server: %s", port)
 	// tryMongoDB()
 	router.Run(port)
