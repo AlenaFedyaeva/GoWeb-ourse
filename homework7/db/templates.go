@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-//primitive.ObjectID
 type Post struct {
 	Id        int	 `bson:"_id" json:"id"`
 	Title     string `schema:"title,title2example" json:"title" xml:"title`

@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"context"
@@ -8,34 +8,52 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-const (
-	DB_NAME       = "posts"
-	DB_COLLECTION = "posts"
-)
-
-func (db *DB) updatePostsMap() {
-	postsNew, err := db.selectAll()
+func (db *DBMongo) UpdatePostsMap() {
+	postsNew, err := db.SelectAll()
 	if err != nil {
 		fmt.Println(err)
 	}
 	posts = postsNew
 }
 
-func (db *DB) selectPost(id int) (Post, error) {
-	post := Post{}
+func (db *DBMongo) SelectAll() (map[int]*Post, error) {
+	resMap := make(map[int]*Post)
 
-	filter := bson.M{"_id": id}
+	filter := bson.D{{}}
+	// collection := db.Client.Database(DB_NAME).Collection(DB_COLLECTION)
 
-	collection := client.Database(DB_NAME).Collection(DB_COLLECTION)
-
-	if err := collection.FindOne(context.Background(), filter).Decode(&post); err != nil {
-		log.Println(err)
-		return post, err
+	cursor, err := db.Collection.Find(context.Background(), filter)
+	if err != nil {
+		log.Println("selectAll find", err)
+		return nil, err
 	}
-	fmt.Println("selectPost: ", post)
-
-	return post, nil
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var post Post
+		if err = cursor.Decode(&post); err != nil {
+			log.Println("selectAll ", err)
+		}
+		// log.Println("episode: ",post)
+		resMap[post.Id] = &post
+	}
+	return resMap, err
 }
+
+// func (db *DBMongo) SelectPost(id int) (Post, error) {
+// 	post := Post{}
+
+// 	filter := bson.M{"_id": id}
+
+// 	collection := client.Database(DB_NAME).Collection(DB_COLLECTION)
+
+// 	if err := collection.FindOne(context.Background(), filter).Decode(&post); err != nil {
+// 		log.Println(err)
+// 		return post, err
+// 	}
+// 	fmt.Println("selectPost: ", post)
+
+// 	return post, nil
+// }
 
 // // primitive.NewObjectID()
 // func insertPost(post Post) error {
@@ -59,28 +77,6 @@ func (db *DB) selectPost(id int) (Post, error) {
 // 	return nil
 // }
 
-// func selectAll() (map[int]*Post, error) {
-// 	resMap := make(map[int]*Post)
-
-// 	filter := bson.D{{}}
-// 	collection := client.Database(DB_NAME).Collection(DB_COLLECTION)
-
-// 	cursor, err := collection.Find(context.Background(), filter)
-// 	if err != nil {
-// 		log.Println("selectAll find", err)
-// 		return nil, err
-// 	}
-// 	defer cursor.Close(context.Background())
-// 	for cursor.Next(context.Background()) {
-// 		var post Post
-// 		if err = cursor.Decode(&post); err != nil {
-// 			log.Println("selectAll ", err)
-// 		}
-// 		// log.Println("episode: ",post)
-// 		resMap[post.Id] = &post
-// 	}
-// 	return resMap, err
-// }
 
 // func updateRow(id int, p Post) error {
 // 	//1) update bd
@@ -135,7 +131,7 @@ func tryMongoDB() {
 	// post, _ := posts[1]
 	// insertPost(*post)
 	// 2) select & update map
-	updatePostsMap()
+	// updatePostsMap()
 	// 3) select one post
 	// postSelect, _ := selectPost(2)
 	// fmt.Println("6 lab posts ", posts, "selectPost", postSelect)
