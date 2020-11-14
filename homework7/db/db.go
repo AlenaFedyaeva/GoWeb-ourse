@@ -1,12 +1,10 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DBInfo struct {
@@ -22,35 +20,17 @@ type DBMongo struct {
 }
 
 type DB interface {
-	// SelectPost(id int) (Post, error)
 	SelectAll() (map[int]*Post, error)
+	SelectPost(id int) (Post, error)
+	InsertPost(post Post) (int,error)
+	UpdateRow(id int, p Post) error 
+	DeleteRow(id int) error
 	UpdatePostsMap()
-	DBInit()
+	DBInit() error
 	Disconnect()
 }
 
-func (db *DBMongo) DBInit() {
-	dbCli, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	db.Client = dbCli
-	err = db.Client.Connect(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = db.Client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Println(err)
-	}
-	db.Collection = db.Client.Database(db.Name).Collection(db.CollectionName)
-}
 
-func (db *DBMongo) Disconnect(){
-	if err := db.Client.Disconnect(context.Background()); err != nil {
-		log.Println(err)
-	}
-}
 
 func UseExample() {
 	fmt.Println("use example")
@@ -63,7 +43,24 @@ func UseExample() {
 	defer func() {
 		mongo.Disconnect()
 	}()
-	mongo.DBInit()
+
+	// 1) init, select all posts
+	err:=mongo.DBInit()
+	if err!=nil{
+		log.Fatal(err)
+	}
+	// 2) insert one
+	post, _ := posts[1]
+	mongo.InsertPost(*post)
+	// 3)  select all posts
 	mongo.UpdatePostsMap()
-	fmt.Println(posts,mongo)
+	// 4) select 1 post
+	postSelect, _ := mongo.SelectPost(3)
+	fmt.Println("7 lab posts ", posts, "selectPost", postSelect)
+	// 5) update one post
+	postU := Post{Title: "Title updated", Text: "3 updated text", Author: "me"}
+	mongo.UpdateRow(4, postU)
+	// 6) del row
+	mongo.DeleteRow(1) 
+	fmt.Println("end",posts,mongo)
 }
