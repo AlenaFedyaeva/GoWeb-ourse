@@ -1,0 +1,33 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is blog",
+        "title": "Posts / my blog",
+        "contact": {
+            "name": "Alena Fedyaeva",
+            "email": "placeholder@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost",
+    "basePath": "/",
+    "paths": {
+        "/post/:id": {
+            "get": {
+                "description": "render one post with id",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "PageGetPost",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "task list id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ]
+            }
+        }
+    }
+}

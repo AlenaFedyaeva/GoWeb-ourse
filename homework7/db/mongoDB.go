@@ -18,7 +18,7 @@ func (db *DBMongo) UpdatePostsMap() {
 	if err != nil {
 		log.Println(err)
 	}
-	posts = postsNew
+	Posts = postsNew
 }
 
 // SelectAll - выбираем все значения из коллекции
@@ -57,7 +57,6 @@ func (db *DBMongo) SelectPost(id int) (Post, error) {
 	return post, nil
 }
 
-// primitive.NewObjectID()
 // InsertPost - вставка одного поста в коллекцию
 func (db *DBMongo) InsertPost(post Post) error {
 	_, err := db.Collection.InsertOne(context.TODO(), post)

@@ -50,17 +50,17 @@ func UseExample() {
 		log.Fatal(err)
 	}
 	// 2) insert one
-	post, _ := posts[1]
+	post, _ := Posts[1]
 	mongo.InsertPost(*post)
 	// 3)  select all posts
 	mongo.UpdatePostsMap()
 	// 4) select 1 post
 	postSelect, _ := mongo.SelectPost(3)
-	fmt.Println("7 lab posts ", posts, "selectPost", postSelect)
+	fmt.Println("7 lab posts ", Posts, "selectPost", postSelect)
 	// 5) update one post
 	postU := Post{Title: "Title updated", Text: "3 updated text", Author: "me"}
 	mongo.UpdateRow(4, postU)
 	// 6) del row
 	mongo.DeleteRow(1) 
-	fmt.Println("end",posts,mongo)
+	fmt.Println("end",Posts,mongo)
 }

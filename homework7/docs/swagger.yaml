@@ -1,0 +1,22 @@
+basePath: /
+host: localhost
+info:
+  contact:
+    email: placeholder@gmail.com
+    name: Alena Fedyaeva
+  description: This is blog
+  title: Posts / my blog
+  version: "1.0"
+paths:
+  /post/:id:
+    get:
+      description: render one post with id
+      parameters:
+      - description: task list id
+        in: query
+        name: id
+        type: string
+      produces:
+      - text/html
+      summary: PageGetPost
+swagger: "2.0"

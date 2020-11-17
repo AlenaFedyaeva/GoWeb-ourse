@@ -23,7 +23,7 @@ type OnePostsStruct struct {
 	Data  Post
 }
 
-var posts = map[int]*Post{
+var Posts = map[int]*Post{
 	1: &(Post{
 		Id:        1,
 		Title:     "some text1",
@@ -46,4 +46,12 @@ var posts = map[int]*Post{
 		CreatedAt: time.Now().Add(-time.Hour),
 	}),
 }
+// temporary ! need - primitive.NewObjectID().
+var (
+	postID = 10
+)
 
+func GetPostId() int {
+	postID++
+	return postID
+}

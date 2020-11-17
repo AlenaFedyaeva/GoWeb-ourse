@@ -1,0 +1,9 @@
+1) Install & run 
+    https://github.com/swaggo/swag#getting-started 
+
+2) My problem "swag: command not found" solved:
+
+the binary will have been installed to $GOPATH/bin/swag.
+Run if from there or copy the file from there to somplace in your $PATH
+
+$  $GOPATH/bin/swag init
