@@ -23,7 +23,8 @@ type OnePostsStruct struct {
 	Data  Post
 }
 
-var Posts = map[int]*Post{
+var Posts  map[int]*Post
+var PostsDefault = map[int]*Post{
 	1: &(Post{
 		Id:        1,
 		Title:     "some text1",

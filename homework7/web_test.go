@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 )
 
 type Client struct {
@@ -19,40 +18,12 @@ type mockDB struct {
 
 
 func (dbm *mockDB) SelectAll() (map[int]*db.Post, error) {
-	rez:= map[int]*db.Post{
-		1: &(db.Post{
-			Id:        1,
-			Title:     "some text1",
-			Text:      "some text1",
-			Author:    "some author1",
-			CreatedAt: time.Now().Add(-time.Hour),
-		}),
-		2: &(db.Post{
-			Id:        2,
-			Title:     "some text2",
-			Text:      "some text2",
-			Author:    "some author2",
-			CreatedAt: time.Now().Add(-time.Hour),
-		}),
-		3: &(db.Post{
-			Id:        3,
-			Title:     "some text3",
-			Text:      "some text3",
-			Author:    "some author3",
-			CreatedAt: time.Now().Add(-time.Hour),
-		}),
-	}
+	rez:= db.PostsDefault
 	 return rez,nil
 }
 func (dbm *mockDB) SelectPost(id int) (db.Post, error){
-	rez:=db.Post{
-		Id:        3,
-		Title:     "some text3",
-		Text:      "some text3",
-		Author:    "some author3",
-		CreatedAt: time.Now().Add(-time.Hour),
-	}
-	return rez, nil
+	rez:=db.PostsDefault[2]
+	return *rez, nil
 }
 func (dbm *mockDB) InsertPost(post db.Post) (int,error){
 	return 0,nil
@@ -83,8 +54,22 @@ func TestListPostRequest(t *testing.T) {
 		Client: srv.Client(),
 		URL: srv.URL,
 	}
-	resp, _ := cli.Get(fmt.Sprintf("%s/", cli.URL))
-	if resp.StatusCode != 200 {
-	   t.Errorf("/ endpoint returned wrong response; expected %d; actual %d", 200, resp.StatusCode)
+	// cli.Get("/?name=Test")
+	resp1, _ := cli.Get(fmt.Sprintf("%s/", cli.URL))
+	if resp1.StatusCode != http.StatusOK  {
+	   t.Errorf("/ endpoint returned wrong response; expected %d; actual %d", http.StatusOK , resp1.StatusCode)
 	}
-  }
+	resp2, _ := cli.Get(fmt.Sprintf("%s/create", cli.URL))
+	if resp1.StatusCode != http.StatusOK  {
+	   t.Errorf("/create endpoint returned wrong response; expected %d; actual %d", http.StatusOK , resp2.StatusCode)
+	}
+	resp3, _ := cli.Get(fmt.Sprintf("%s/edit/:%s", cli.URL,"2"))
+	if resp1.StatusCode != http.StatusOK  {
+	   t.Errorf("/edit/:id endpoint returned wrong response; expected %d; actual %d", http.StatusOK , resp3.StatusCode)
+	}
+	resp4, _ := cli.Get(fmt.Sprintf("%s/post/:%s", cli.URL,"2"))
+	if resp1.StatusCode != http.StatusOK  {
+	   t.Errorf("/post/:id endpoint returned wrong response; expected %d; actual %d", http.StatusOK , resp4.StatusCode)
+	}
+	// json.NewDecoder(resp1.Body)
+ }
