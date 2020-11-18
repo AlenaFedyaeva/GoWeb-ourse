@@ -58,11 +58,11 @@ func (db *DBMongo) SelectPost(id int) (Post, error) {
 }
 
 // InsertPost - вставка одного поста в коллекцию
-func (db *DBMongo) InsertPost(post Post) error {
+func (db *DBMongo) InsertPost(post Post) (int,error) {
 	_, err := db.Collection.InsertOne(context.TODO(), post)
 	if err != nil {
 		log.Println("InsertOne ERROR:", err)
-		return err
+		return 0,err
 	}
 	
 	// get the inserted ID string
@@ -72,7 +72,7 @@ func (db *DBMongo) InsertPost(post Post) error {
 	//2) update map values
 	db.UpdatePostsMap()
 
-	return nil
+	return 0,nil
 }
 
 // UpdateRow - обновляем пост в коллекции

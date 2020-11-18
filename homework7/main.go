@@ -6,9 +6,6 @@ import (
 	"fmt"
 )
 
-var mongo db.DBMongo
-
-
 // @title Posts / my blog
 // @version 1.0
 // @description This is blog
@@ -29,12 +26,13 @@ func main() {
 	defer func() {
 		mongo.Disconnect()
 	}()
-
 	
 	port := ":8095"
 	fmt.Printf(" start server: %s", port)
-	// router.Run(port)
+	c := &db.Controller{
+		ControllerDB: mongo,
+	}
 
-	srv := setupServer()
+	srv := db.SetupServer(c)
 	srv.Run(port)
 }

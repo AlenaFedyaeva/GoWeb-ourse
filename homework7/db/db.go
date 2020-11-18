@@ -29,7 +29,9 @@ type DB interface {
 	DBInit() error
 	Disconnect()
 }
-
+type Controller struct {
+	ControllerDB DB
+}
 
 
 func UseExample() {
