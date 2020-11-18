@@ -8,6 +8,40 @@ info:
   title: Posts / my blog
   version: "1.0"
 paths:
+  /:
+    get:
+      description: show all posts in blog
+      produces:
+      - text/html
+      summary: PagePostList
+  /create:
+    get:
+      description: show page for new post
+      produces:
+      - text/html
+      summary: PageNewPost
+    post:
+      description: update posts & redirect to /
+      produces:
+      - text/html
+      summary: FormPageNewPost
+  /delete/:id:
+    post:
+      description: delete post and redirect to /
+      produces:
+      - text/html
+      summary: ButtonDeletePost
+  /edit/:id:
+    get:
+      description: show page for new post
+      produces:
+      - text/html
+      summary: PageUpdatePost
+    put:
+      description: show page for new post
+      produces:
+      - text/html
+      summary: FormUpdatePost
   /post/:id:
     get:
       description: render one post with id

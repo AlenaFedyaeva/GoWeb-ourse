@@ -141,6 +141,7 @@ func (db *DBMongo) DBInit() error {
 		return err
 	}
 	db.Collection = db.Client.Database(db.Name).Collection(db.CollectionName)
+	db.UpdatePostsMap()
 	return nil
 }
 

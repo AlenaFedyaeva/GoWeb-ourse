@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 // @Summary PageGetPost
@@ -34,14 +36,20 @@ func renderTemplate(c *gin.Context, tmplName string, data interface{}) {
 	c.HTML(http.StatusOK, tmplName, data)
 }
 
-// //Get
-// //3. Создайте роут и шаблон для создания материала
+
+
+// @Summary PageNewPost
+// @Description show page for new post
+// @Produce  text/html
+// @Router /create [get]
 func createPostHandlerGet(c *gin.Context) {
 	renderTemplate(c, "CreatePosts", struct{ Title string }{"Новый пост"})
 }
 
-// //POST
-// //3. Создайте роут и шаблон для создания материала
+// @Summary FormPageNewPost
+// @Description update posts & redirect to /
+// @Produce  text/html
+// @Router /create [post]
 func createPostHandlerPost(c *gin.Context) {
 	c.Request.ParseForm()
 
@@ -60,7 +68,10 @@ func createPostHandlerPost(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
-// //3. Создайте роут и шаблон для редактированияматериала.
+// @Summary PageUpdatePost
+// @Description show page for new post
+// @Produce  text/html
+// @Router /edit/:id [get]
 func updatePostHandleGet(c *gin.Context) {
 	postIDRaw := c.Param("id")
 	if postIDRaw == "" {
@@ -78,8 +89,12 @@ func updatePostHandleGet(c *gin.Context) {
 	renderTemplate(c, "EditPost", post)
 }
 
-//PUT
-//C Postman PUT работает:x-www-form-urlncoded заполняем ключи author, text, title и значения  и отправляем POST
+// C Postman PUT работает:x-www-form-urlncoded заполняем ключи author, text, title и значения  и отправляем POST
+
+// @Summary FormUpdatePost
+// @Description show page for new post
+// @Produce  text/html
+// @Router /edit/:id [put]
 func updatePostHandlePut(c *gin.Context) {
 	postIDRaw := c.Param("id")
 	if postIDRaw == "" {
@@ -103,7 +118,10 @@ func updatePostHandlePut(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
-//Delete post
+// @Summary ButtonDeletePost
+// @Description delete post and redirect to / 
+// @Produce  text/html
+// @Router /delete/:id [post]
 func deletePostHandlerPost(c *gin.Context)  {
 	postIDRaw := c.Param("id")
 	if postIDRaw == "" {
@@ -120,9 +138,39 @@ func deletePostHandlerPost(c *gin.Context)  {
 	mongo.DeleteRow(postID)
 	c.Redirect(http.StatusSeeOther, "/")
 }
-
-// //GET
-// //1. роут и шаблон для отображения всех постов в блоге.
+// @Summary PagePostList
+// @Description show all posts in blog
+// @Produce  text/html
+// @Router / [get]
 func listPostHandler(c *gin.Context) {
 	renderTemplate(c, "AllPosts", db.AllPostsStruct{Title: "Список всех постов", Data: db.Posts})
+}
+
+
+
+func setupServer() *gin.Engine {
+	router := gin.Default()
+
+	router.LoadHTMLGlob("static/*")
+
+	//Шаблон со списком всех постов / короткие без Text
+	router.GET("/", listPostHandler)
+	router.POST("/delete/:id", deletePostHandlerPost)
+
+	//Шаблон с текстовыми полями для задания  Title Text Author
+	router.GET("/create", createPostHandlerGet)
+	router.POST("/create", createPostHandlerPost)
+
+	//Шаблон со страницей одного поста / полгого с отображением Text
+	router.GET("/post/:id", getPostHandlerID)
+
+	//Шаблон с текстовыми полями для обновления Title Text Author
+	router.GET("/edit/:id", updatePostHandleGet)
+	router.POST("/edit/:id", updatePostHandlePut)
+
+	//Docs
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	
+
+	return router
 }
