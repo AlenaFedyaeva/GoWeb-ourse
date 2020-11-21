@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -17,6 +18,8 @@ type DBMongo struct {
 	CollectionName string
 	Collection     *mongo.Collection
 	Client         *mongo.Client
+	Logger *zerolog.Logger
+
 }
 
 type DB interface {

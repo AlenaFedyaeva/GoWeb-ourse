@@ -13,6 +13,7 @@ type FileConfig struct {
 	DB             db.DBInfo
 	CollectionName string
 	Port           string
+	LogName 	string
 }
 
 var DefaultConf FileConfig=FileConfig{
@@ -21,6 +22,7 @@ var DefaultConf FileConfig=FileConfig{
 		},
 		CollectionName: "posts",
 		Port: "9090",
+		LogName: "log.txt",
 }
 
 func (conf *FileConfig) WriteConfigJson(fname string) {

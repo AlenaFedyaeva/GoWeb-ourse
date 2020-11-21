@@ -148,6 +148,6 @@ func (db *DBMongo) DBInit() error {
 // Disconnect - close DB connect 
 func (db *DBMongo) Disconnect(){
 	if err := db.Client.Disconnect(context.Background()); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }

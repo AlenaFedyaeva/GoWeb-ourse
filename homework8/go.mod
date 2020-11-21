@@ -10,6 +10,7 @@ require (
 	github.com/go-openapi/spec v0.19.13 // indirect
 	github.com/go-openapi/swag v0.19.12 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
+	github.com/rs/zerolog v1.20.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
