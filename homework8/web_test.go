@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GoWebCourse/homework7/db"
+	"GoWebCourse/homework8/db"
 	"fmt"
 	"net/http"
 	"net/http/httptest"

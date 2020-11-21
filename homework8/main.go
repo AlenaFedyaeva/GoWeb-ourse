@@ -1,11 +1,14 @@
 package main
 
 import (
-	"GoWebCourse/homework7/db"
-	_ "GoWebCourse/homework7/docs"
-	"flag"
+	"GoWebCourse/homework8/config"
 	"fmt"
-	"os"
+	"log"
+
+	"GoWebCourse/homework8/db"
+	_ "GoWebCourse/homework8/docs"
+
+	"flag"
 )
 
 // @title Posts / my blog
@@ -17,30 +20,34 @@ import (
 
 // @host localhost
 // @BasePath /
-
-
-
-type fileSave struct{
-	DB db.DBInfo 
-	CollectionName string
-	port string
-}
-
 func main() {
-	fmt.Print(os.Args)
-	argsWithoutProg := os.Args[1:]
-	fmt.Println(argsWithoutProg)
+	var conf config.FileConfig
+    //NOTE: Использую сразу все варианты загрузки конфигурации, в учебных целях. В таком простом примере можно было бы оставить только Env например)
+	// 1) Read config file name from Environment Variable
+	fname,okEnv:=config.LookupEnv("CONF_HW8") 
+	if !okEnv{
+		log.Fatal("LookupEnv err")
+	}
+
+	// 2) Read port from args 
 	portF := flag.String("port","9090","a string")
-	configF := flag.String("config","/","a string")
-	flag.Parse()
-	fmt.Println("port", *portF,portF)
-	fmt.Println("config", *configF)	
-	
+    flag.Parse()
+
+	if *portF==""{
+		log.Fatal("Empty value err")
+	}
+	//3) Read config file 
+	errFile:=conf.ReadConfigJson(fname)
+	if errFile!=nil{
+		log.Fatal("Parse args :",errFile)
+	}
+	conf.Port=*portF
+	// 4) INIT mongo db
 	mongo := &db.DBMongo{
-		DBInfo: db.DBInfo{URI: "mongodb://localhost:27017",
-			Name: "posts",
+		DBInfo: db.DBInfo{URI: conf.DB.URI,
+			Name: conf.DB.Name,
 		},
-		CollectionName: "posts",
+		CollectionName: conf.CollectionName,
 	}
 	mongo.DBInit()
 	defer func() {

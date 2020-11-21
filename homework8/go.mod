@@ -1,4 +1,4 @@
-module GoWebCourse/homework7
+module GoWebCourse/homework8
 
 go 1.14
 
