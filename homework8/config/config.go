@@ -1,62 +1,44 @@
 package config
 
 import (
-	"GoWebCourse/homework8/db"
-	"encoding/json"
+	"errors"
+	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 )
 
-type FileConfig struct {
-	DB             db.DBInfo
-	CollectionName string
-	Port           string
-	LogName 	string
-}
+func (cfg *FileConfig) ParseFlags() (error) {
+	logNameF:=flag.String("log","log.tmp","file name")
+	portF := flag.String("port","9090","a string")
 
-var DefaultConf FileConfig=FileConfig{
-	DB: db.DBInfo{URI: "mongodb://localhost:27017",
-			Name: "posts",
-		},
-		CollectionName: "posts",
-		Port: "9090",
-		LogName: "log.txt",
-}
+	flag.Parse()
 
-func (conf *FileConfig) WriteConfigJson(fname string) {
-	file, _ := os.OpenFile(fname,  os.O_RDWR|os.O_CREATE, os.ModePerm)
-	defer file.Close()
-	encoder := json.NewEncoder(file)
-	encoder.Encode(conf)
-	fmt.Println("write in ", fname,*conf,file)
-
-}
-
-func (conf *FileConfig) ReadConfigJson(fname string) error {
-	var tmp FileConfig
-	data, err := ioutil.ReadFile(fname)
-	if err!=nil{
-		log.Println(err,data, &data)
-		return err
+	// 1) Read port from args 
+	if *portF==""{
+		str:="Empty flag port"
+		log.Fatal(str)
+		return errors.New(str)
 	}
-	err=json.Unmarshal(data, &tmp)
-	if err!=nil{
-		log.Println(err,data, &data,tmp)
-		return err
+
+	if *logNameF==""{
+		str:="Empty flag logName"
+		log.Fatal(str)
+		return errors.New(str)
 	}
-	*conf=tmp
-	fmt.Println("read from ", fname,conf)
+	cfg.Port=*portF
+	cfg.LogName=*logNameF
+	// fmt.Println("Your flags: ", *logNameF,"port: ",*portF)
 	return nil
 }
 
-func WriteDefaultConfigJson(fname string){
-	DefaultConf.WriteConfigJson(fname)
+func ValidateConfigPath(path string) error {
+    s, err := os.Stat(path)
+    if err != nil {
+        return err
+    }
+    if s.IsDir() {
+        return fmt.Errorf("'%s' is a directory, not a normal file", path)
+    }
+    return nil
 }
-
-// func IfFileExist(fname) bool{
-// 	// if _, err := os.Stat("/path/to/whatever"); os.IsNotExist(err) {
-// 		// path/to/whatever does not exist
-// 	// }
-// }

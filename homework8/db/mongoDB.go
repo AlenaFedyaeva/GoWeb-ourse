@@ -16,6 +16,7 @@ import (
 func (db *DBMongo) UpdatePostsMap() {
 	postsNew, err := db.SelectAll()
 	if err != nil {
+		db.Logger.Error().Err(err)
 		log.Println(err)
 	}
 	Posts = postsNew
@@ -28,14 +29,17 @@ func (db *DBMongo) SelectAll() (map[int]*Post, error) {
 
 	cursor, err := db.Collection.Find(context.Background(), filter)
 	if err != nil {
-		log.Println("selectAll find", err)
+		db.Logger.Error().Err(err)
+		log.Println(err)
 		return nil, err
 	}
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
 		var post Post
 		if err = cursor.Decode(&post); err != nil {
-			log.Println("selectAll ", err)
+			str := "unable to decode post "
+			db.Logger.Error().Err(err).Msgf(str)
+			log.Println(err, str)
 		}
 		// log.Println("episode: ",post)
 		resMap[post.Id] = &post
@@ -49,7 +53,9 @@ func (db *DBMongo) SelectPost(id int) (Post, error) {
 	filter := bson.M{"_id": id}
 
 	if err := db.Collection.FindOne(context.Background(), filter).Decode(&post); err != nil {
-		log.Println(err)
+		str := fmt.Sprintf("unable to get post by id %d", id)
+		db.Logger.Error().Err(err).Msgf(str)
+		log.Println(err, str)
 		return post, err
 	}
 	fmt.Println("selectPost: ", post)
@@ -58,25 +64,23 @@ func (db *DBMongo) SelectPost(id int) (Post, error) {
 }
 
 // InsertPost - вставка одного поста в коллекцию
-func (db *DBMongo) InsertPost(post Post) (int,error) {
+func (db *DBMongo) InsertPost(post Post) (int, error) {
 	_, err := db.Collection.InsertOne(context.TODO(), post)
 	if err != nil {
-		log.Println("InsertOne ERROR:", err)
-		return 0,err
+		str := "Insert one post ERROR"
+		db.Logger.Error().Err(err).Msgf(str)
+		log.Println(err, str)
+		return 0, err
 	}
-	
-	// get the inserted ID string
-	// newID := insertResult.InsertedID
-	// fmt.Println("InsertOne() newID:", newID)
-	// fmt.Println("InsertOne() newID type:", reflect.TypeOf(newID))
+
 	//2) update map values
 	db.UpdatePostsMap()
 
-	return 0,nil
+	return 0, nil
 }
 
 // UpdateRow - обновляем пост в коллекции
-func (db *DBMongo)  UpdateRow(id int, p Post) error {
+func (db *DBMongo) UpdateRow(id int, p Post) error {
 	//1) update bd
 	p.UpdatedAt = time.Now()
 	colQuerier := bson.M{"_id": id}
@@ -88,6 +92,7 @@ func (db *DBMongo)  UpdateRow(id int, p Post) error {
 
 	_, err := db.Collection.UpdateOne(context.Background(), colQuerier, change)
 	if err != nil {
+		db.Logger.Error().Err(err)
 		log.Println(err)
 		return err
 	}
@@ -98,24 +103,26 @@ func (db *DBMongo)  UpdateRow(id int, p Post) error {
 }
 
 // DeleteRow - удаляем один пост в коллекции
-func  (db *DBMongo) DeleteRow(id int) error {
+func (db *DBMongo) DeleteRow(id int) error {
 	//1) update bd
 	colQuerier := bson.M{"_id": id}
 	res, err := db.Collection.DeleteOne(context.Background(), colQuerier)
 	fmt.Println("DeleteOne Result TYPE:", reflect.TypeOf(res))
 
 	if err != nil {
-		log.Println("DeleteOne() ERROR:", err)
+		db.Logger.Error().Err(err)
+		log.Println(err)
 		return err
 	}
 	// Check if the response is 'nil'
 	if res.DeletedCount == 0 {
-		log.Println("DeleteOne() document not found:", res)
+		str:="DeleteOne() document not found"
+		db.Logger.Error().Msgf(str)
+		log.Println(str)
 	} else {
-		// Print the results of the DeleteOne() method
-		log.Println("DeleteOne Result:", res)
-		// *mongo.DeleteResult object returned by API call
-		log.Println("DeleteOne TYPE:", reflect.TypeOf(res))
+		str:=fmt.Sprintf("DeleteOne resulr &s , type &s ", res, reflect.TypeOf(res).String())
+		db.Logger.Info().Msgf(str)
+		log.Println(str)
 	}
 	//2) update map values
 	db.UpdatePostsMap()
@@ -126,17 +133,20 @@ func  (db *DBMongo) DeleteRow(id int) error {
 func (db *DBMongo) DBInit() error {
 	dbCli, err := mongo.NewClient(options.Client().ApplyURI(db.URI))
 	if err != nil {
+		db.Logger.Error().Err(err)
 		log.Println(err)
 		return err
 	}
 	db.Client = dbCli
 	err = db.Client.Connect(context.Background())
 	if err != nil {
+		db.Logger.Error().Err(err)
 		log.Println(err)
 		return err
 	}
 	err = db.Client.Ping(context.Background(), nil)
 	if err != nil {
+		db.Logger.Error().Err(err)
 		log.Println(err)
 		return err
 	}
@@ -145,9 +155,10 @@ func (db *DBMongo) DBInit() error {
 	return nil
 }
 
-// Disconnect - close DB connect 
-func (db *DBMongo) Disconnect(){
+// Disconnect - close DB connect
+func (db *DBMongo) Disconnect() {
 	if err := db.Client.Disconnect(context.Background()); err != nil {
+		db.Logger.Error().Err(err)
 		log.Fatal(err)
 	}
 }

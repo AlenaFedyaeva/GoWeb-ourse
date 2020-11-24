@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
+
+	// "github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/mongo"
-)
+)	
 
 type DBInfo struct {
-	Name string
-	URI  string
+	Name string `yaml: name`
+	URI  string `yaml: uri`
 }
 
 type DBMongo struct {
@@ -34,6 +36,7 @@ type DB interface {
 }
 type Controller struct {
 	ControllerDB DB
+	Logger *zerolog.Logger
 }
 
 
@@ -52,7 +55,8 @@ func UseExample() {
 	// 1) init, select all posts
 	err:=mongo.DBInit()
 	if err!=nil{
-		log.Fatal(err)
+		//log.Println(err)
+		log.Fatal()
 	}
 	// 2) insert one
 	post, _ := Posts[1]

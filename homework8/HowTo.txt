@@ -32,8 +32,14 @@ echo $CONF_HW8
 Unset: 
 unset VARIABLE_NAME
 
-2) In VSCODE enter "DEBUG: open launch.json"  
+2) In VSCODE   ctrl+shift+P enter "DEBUG: open launch.json"  
 2) enter "DEBUG: open launch.json":
+3) Add in field 
 "env": {
                 "CONF_HW8": "config.json"
             },
+
+--------------------------------------------------------------------
+
+1) YAML https://github.com/go-yaml/yaml
+2) ZEROLOG https://github.com/rs/zerolog

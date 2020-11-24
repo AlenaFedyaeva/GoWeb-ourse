@@ -22,8 +22,8 @@ func (cnt *Controller) getPostHandlerID(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	post, ok := Posts[postID]
-	if !ok {
+	post, err := cnt.ControllerDB.SelectPost(postID)//Posts[postID]
+	if err!=nil {
 		c.Writer.WriteHeader(http.StatusNotFound)
 		return
 	}

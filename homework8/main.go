@@ -2,16 +2,14 @@ package main
 
 import (
 	"GoWebCourse/homework8/config"
-	"GoWebCourse/homework8/log"
+	newlog "GoWebCourse/homework8/newlog"
 	"fmt"
 	"log"
 
-	"github.com/rs/zerolog/log"
+	// "github.com/rs/zerolog/log"
 
 	"GoWebCourse/homework8/db"
 	_ "GoWebCourse/homework8/docs"
-
-	"flag"
 )
 
 // @title Posts / my blog
@@ -25,23 +23,14 @@ import (
 // @BasePath /
 func main() {
 	var cfg config.FileConfig
+	// 1) Read flags
+	cfg.ParseFlags()
 
-	debug := flag.Bool("debug", false, "sets log level to debug")
-	portF := flag.String("port","9090","a string")
-
-	flag.Parse()
-
-	// 1) Read port from args 
-	if *portF==""{
-		log.Fatal("Empty value err")
-	}
-	fmt.Println("debug: ", *debug,"port: ",*portF)
-
-    //NOTE: Использую сразу все варианты загрузки конфигурации, в учебных целях. В таком простом примере можно было бы оставить только Env например)
+	//NOTE: Использую сразу все варианты загрузки конфигурации, в учебных целях.
 	// 2) Read config file name from Environment Variable
-	fname,okEnv:=config.LookupEnv("CONF_HW8") 
-	if !okEnv{
-		log.Fatal("LookupEnv err")
+	fname,err:=config.GetFileNameFromEnv("CONF_HW8") 
+	if err!=nil {
+		log.Fatal(err)
 	}
 	
 	//3) Read config file 
@@ -49,30 +38,34 @@ func main() {
 	if errFile!=nil{
 		log.Fatal("Parse args :",errFile)
 	}
-	cfg.Port=*portF
-	// 4) INIT mongo db
+
+	//  4) INIT logger
+	logger,errLogger:=newlog.NewFileLogger(cfg.LogName)
+	if errLogger!=nil{
+		log.Fatal("NewFileLogger:",errLogger,logger)
+	}
+	logger.Info().Str("port", cfg.Port).Msg("start server")
+
+	// 5) INIT mongo db
 	mongo := &db.DBMongo{
 		DBInfo: db.DBInfo{URI: cfg.DB.URI,
 			Name: cfg.DB.Name,
 		},
 		CollectionName: cfg.CollectionName,
+		Logger: logger,
 	}
 	mongo.DBInit()
 	defer func() {
 		mongo.Disconnect()
 	}()
-	//  5) INIT logger
-	logger,errLogger:=log.NewFileLogger(cfg.LogName)
-	if errLogger!=nil{
-		log.Fatal("NewFileLogger:",errLogger)
-	}
 
-	port := ":"+*portF
-	fmt.Printf(" start server: %s", port)
+
+	fmt.Printf(" start server: %s", cfg.Port)
 	c := &db.Controller{
 		ControllerDB: mongo,
+		Logger: logger,
 	}
 
 	srv := db.SetupServer(c)
-	srv.Run(port)
+	srv.Run(fmt.Sprintf(":%s",cfg.Port))
 }
