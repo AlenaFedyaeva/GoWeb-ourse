@@ -1,0 +1,14 @@
+{"level":"info","foo":"bar","time":"2020-11-24T23:04:12+03:00","message":"hello world"}
+{"level":"info","foo":"bar","time":"2020-11-24T23:07:16+03:00","message":"hello world"}
+{"level":"error","error":"mongo: no documents in result","time":"2020-11-24T23:07:36+03:00","message":"unable to get post by id 0"}
+{"level":"info","foo":"bar","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:19:48+03:00","message":"hello world"}
+{"level":"error","error":"mongo: no documents in result","caller":"/home/alena/go/src/GoWebCourse/homework8/db/mongoDB.go:58","time":"2020-11-24T23:20:27+03:00","message":"unable to get post by id 0"}
+{"level":"info","foo":"bar","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:30:46+03:00","message":"hello world"}
+{"level":"error","error":"mongo: no documents in result","caller":"/home/alena/go/src/GoWebCourse/homework8/db/mongoDB.go:57","time":"2020-11-24T23:30:56+03:00","message":"unable to get post by id 78"}
+{"level":"info","port":"9090","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:32:41+03:00","message":"hello world"}
+{"level":"info","port":"9090","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:33:03+03:00","message":"start server"}
+{"level":"info","port":"9091","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:33:23+03:00","message":"start server"}
+{"level":"info","port":"9091","caller":"/home/alena/go/src/GoWebCourse/homework8/main.go:47","time":"2020-11-24T23:35:06+03:00","message":"start server"}
+{"level":"error","error":"multiple write errors: [{write errors: [{E11000 duplicate key error collection: posts.posts index: _id_ dup key: { _id: 11 }}]}, {<nil>}]","caller":"/home/alena/go/src/GoWebCourse/homework8/db/mongoDB.go:71","time":"2020-11-24T23:35:45+03:00","message":"Insert one post ERROR"}
+{"level":"info","caller":"/home/alena/go/src/GoWebCourse/homework8/db/mongoDB.go:124","time":"2020-11-24T23:35:57+03:00","message":"DeleteOne resulr &s , type &s %!!(MISSING)(EXTRA *mongo.DeleteResult=&{1}, string=*mongo.DeleteResult)"}
+{"level":"error","error":"mongo: no documents in result","caller":"/home/alena/go/src/GoWebCourse/homework8/db/mongoDB.go:57","time":"2020-11-24T23:37:06+03:00","message":"unable to get post by id 277"}

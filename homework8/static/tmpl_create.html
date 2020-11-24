@@ -1,0 +1,33 @@
+{{define "CreatePosts"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>{{.Title}}</title>
+    {{template "head"}}
+</head>
+
+<body>
+    {{template "header"}}
+    <div class="uk-container">
+
+        <div class="uk-navbar-left">
+            <h2>{{.Title}} </h2>
+        </div>
+        <div class="uk-navbar-left">
+
+            <form method="post">
+                <div>
+                    Title:<input type="text" name="title"> <br> Author:
+                    <input type="text" name="author"> <br> Post text:
+                    <textarea name="text"></textarea> <br />
+                    <input type="submit" value="Save post">
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+    {{template "footer"}}
+</body>
+{{end}}
