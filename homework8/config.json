@@ -1,0 +1,6 @@
+{
+    "DB": { "Name": "posts", "URI": "mongodb://localhost:27017" },
+    "CollectionName": "posts",
+    "Port": "9091",
+    "LogName": "log.txt"
+}
